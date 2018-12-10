@@ -1,0 +1,12 @@
+{
+  "name": "Email Notifications",
+  "namespace": "ISGlobal\\EmailNotificationsExternalModule",
+  "description": "Allows project administrators to schedule email notifications (hourly, daily, weekly or monthly) to one or more recipients summarizing record creation events.",
+  "authors": [
+    {
+      "name": "Máximo Ramírez Robles",
+      "email": "maximo.ramirez@isglobal.org",
+      "institution": "ISGlobal"
+    }
+  ]
+}
