@@ -11,5 +11,11 @@ namespace ISGlobal\EmailNotificationsExternalModule;
 
 class EmailNotificationsExternalModule extends \ExternalModules\AbstractExternalModule
 {
+    /**
+     * Function called by the Cron equally named to check and notify if new records were created through the API.
+     */
+    function hourly_notifications()
+    {
 
+    }
 }
