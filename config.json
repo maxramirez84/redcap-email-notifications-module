@@ -10,12 +10,16 @@
     }
   ],
 
+  "permissions": [
+    "redcap_save_record"
+  ],
+
   "crons": [
     {
-      "cron_name": "hourly_notifications",
-      "cron_description": "Cron that runs every hour to check and notify if new records were created through the API",
-      "method": "hourly_notifications",
-      "cron_frequency": "86400",
+      "cron_name": "minute_notifications",
+      "cron_description": "Cron that runs every minute to check and notify if new records were created through the API",
+      "method": "minute_notifications",
+      "cron_frequency": "60",
       "cron_max_run_time": "300"
     }
   ]
