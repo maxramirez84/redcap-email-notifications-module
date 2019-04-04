@@ -18,5 +18,38 @@
       "cron_frequency": "60",
       "cron_max_run_time": "300"
     }
+  ],
+
+  "project-settings": [
+    {
+      "key": "recipients",
+      "name": "Notification recipient",
+      "type": "sub_settings",
+      "repeatable": true,
+      "sub_settings": [
+        {
+          "key": "user",
+          "name": "User",
+          "required" : true,
+          "type": "user-list"
+        },
+        {
+          "key": "frequency",
+          "name": "Frequency",
+          "required": true,
+          "type": "dropdown",
+          "choices": [
+            {
+              "value": "minute",
+              "name": "Every minute"
+            },
+            {
+              "value": "hourly",
+              "name": "Hourly"
+            }
+          ]
+        }
+      ]
+    }
   ]
 }
