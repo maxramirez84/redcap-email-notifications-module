@@ -10,10 +10,6 @@
     }
   ],
 
-  "permissions": [
-    "redcap_save_record"
-  ],
-
   "crons": [
     {
       "cron_name": "minuteNotifications",
