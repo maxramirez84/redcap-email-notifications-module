@@ -36,6 +36,7 @@ use REDCap;
 class EmailNotificationsExternalModule extends AbstractExternalModule
 {
     const REDCAP_LOG_EVENT_TABLE = "redcap_log_event";
+    const REDCAP_USER_INFORMATION_TABLE = "redcap_user_information";
     const CREATE_RECORD_API_DESCRIPTION = "Create record (API)";
 
     private $_enabled_projects = [];
@@ -94,12 +95,23 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                     );
                 }
                 define("PROJECT_ID", $project_id);
+                $_GET['pid'] = $project_id;
 
                 // DEBUG
                 // REDCap::logEvent(
                 //     "Project-level (project $project_id) ".
                 //     "REDCap::logEvent from cron method."
                 // );
+
+                // Check if recipients were configured. If not, exit
+                $recipients = $this->getSubSettings("recipients");
+
+                // DEBUG
+                Plugin::log("Project Settings[recipients]:", $recipients);
+
+                if (sizeof($recipients) == 0) {
+                    return;
+                }
 
                 // Send email notification if new records were created
                 // Check if new records were created through the API during the
@@ -119,20 +131,45 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 // DEBUG
                 Plugin::log("Checking in DB if new records arrived", $sql);
 
-                $result = $this->query($sql);
-                if (mysqli_num_rows($result) > 0) {
+                $result_records = $this->query($sql);
+                if ($result_records->num_rows > 0) {
                     // DEBUG
-                    Plugin::log(
-                        "New records created during the last minute! " .
-                        "Sending email notification..."
-                    );
+                    Plugin::log("New records created during the last minute!");
 
-                    REDCap::email(
-                        "maximo.ramirez@isglobal.org",
-                        "maximo.ramirez@isglobal.org",
-                        "New records created during tha last minute!!",
-                        "Is this test working?"
-                    );
+                    // Send email notification to users with 'minute' frequency
+                    // configured in project settings
+                    foreach ($recipients as $key => $recipient) {
+                        if ($recipient['frequency'] == "minute") {
+                            // DEBUG
+                            Plugin::log(
+                                "Sending email notification to " . $recipient['user']
+                            );
+
+                            // Get user email
+                            $query = "SELECT * FROM %s WHERE username = '%s'";
+                            $sql = sprintf(
+                                $query,
+                                self::REDCAP_USER_INFORMATION_TABLE,
+                                $recipient['user']
+                            );
+
+                            // DEBUG
+                            Plugin::log("Checking in DB user information", $sql);
+
+                            $result_user = $this->query($sql);
+                            $user = $result_user->fetch_assoc();
+
+                            // DEBUG
+                            Plugin::log("Result:", $user);
+
+                            REDCap::email(
+                                $user['user_email'],
+                                "maximo.ramirez@isglobal.org",
+                                "New records created during the last minute!!",
+                                "Is this test working?"
+                            );
+                        }
+                    }
                 }
             }
         }
