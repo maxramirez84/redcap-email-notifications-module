@@ -1,7 +1,7 @@
 {
   "name": "Email Notifications",
   "namespace": "ISGlobal\\EmailNotificationsExternalModule",
-  "description": "Allows project administrators to schedule email notifications (hourly, daily, weekly or monthly) to one or more recipients summarizing record creation events.",
+  "description": "Allows project administrators to schedule email notifications (every minute, hourly, daily, weekly or monthly) to one or more recipients summarizing record creation through REDCap API, i.e. REDCap Mobile App.",
   "authors": [
     {
       "name": "Maximo Ramirez Robles",
