@@ -12,7 +12,7 @@
 
   "crons": [
     {
-      "cron_name": "minuteNotifications",
+      "cron_name": "minute_notifications",
       "cron_description": "Cron that runs every minute to check and notify if new records were created through the API",
       "method": "minuteNotifications",
       "cron_frequency": "60",
