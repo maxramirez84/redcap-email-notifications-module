@@ -4,7 +4,7 @@
   "description": "Allows project administrators to schedule email notifications (hourly, daily, weekly or monthly) to one or more recipients summarizing record creation events.",
   "authors": [
     {
-      "name": "Máximo Ramírez Robles",
+      "name": "Maximo Ramirez Robles",
       "email": "maximo.ramirez@isglobal.org",
       "institution": "ISGlobal"
     }
@@ -16,9 +16,9 @@
 
   "crons": [
     {
-      "cron_name": "minute_notifications",
+      "cron_name": "minuteNotifications",
       "cron_description": "Cron that runs every minute to check and notify if new records were created through the API",
-      "method": "minute_notifications",
+      "method": "minuteNotifications",
       "cron_frequency": "60",
       "cron_max_run_time": "300"
     }
