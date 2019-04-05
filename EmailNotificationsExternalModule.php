@@ -22,6 +22,7 @@ use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 use Plugin;
 use Project;
+use RCView;
 use REDCap;
 
 /**
@@ -66,6 +67,55 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     }
 
     /**
+     * Parse INI language file, stored in the module folder inside /redcap/modules
+     * directory, based on the project language. If language file not found,
+     * English.ini loaded by default.
+     *
+     * @param string $language   Language name to be loaded
+     * @param bool   $show_error Whether to show errors or not
+     *
+     * @return array Array of language strings
+     */
+    public function callLanguageFile($language = 'English', $show_error = true)
+    {
+        global $lang;
+
+        // DEBUG
+        Plugin::log("Project language = $language");
+
+        // Get path of language file
+        $dir = dirname(__FILE__);
+        // English and other language files are kept in the EM folder
+        $language_file = $dir . DS . "$language.ini";
+
+        // DEBUG
+        // Plugin::log("Language file path = $language_file");
+
+        // Parse ini file into an array
+        $this_lang = parse_ini_file($language_file);
+
+        // If fails, parse English.ini by default
+        if ($show_error && (!$this_lang || !is_dir($dir))) {
+            $language_file = $dir . DS . "English.ini";
+            $this_lang = parse_ini_file($language_file);
+
+            if (!$this_lang) {
+                exit(
+                    $lang['config_functions_63'] .
+                    "<br>" .
+                    RCView::escape($language_file)
+                );
+            }
+        }
+
+        // DEBUG
+        Plugin::log("$language_file loaded");
+
+        // Return array of language text
+        return $this_lang;
+    }
+
+    /**
      * Function called by the Cron equally named to check and notify if new records
      * were created through the API in the specified time interval.
      *
@@ -86,7 +136,7 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         // DEBUG
         Plugin::log("System Settings[sender]: $sender");
 
-        if ($sender == NULL) {
+        if ($sender == null) {
             return;
         }
 
@@ -106,6 +156,10 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 }
                 define("PROJECT_ID", $project_id);
                 $_GET['pid'] = $project_id;
+
+                // EM internationalization from project language value
+                $project_language = $Project->project['project_language'];
+                $project_lang = $this->callLanguageFile($project_language);
 
                 // DEBUG
                 // REDCap::logEvent(
@@ -175,7 +229,7 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                             REDCap::email(
                                 $user['user_email'],
                                 $sender,
-                                "New records created during the last minute!!",
+                                $project_lang['em_email_notifications_01'],
                                 "Is this test working?"
                             );
                         }
