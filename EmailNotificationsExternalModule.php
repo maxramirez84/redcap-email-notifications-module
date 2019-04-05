@@ -80,6 +80,16 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         // DEBUG
         // REDCap::logEvent("System-level REDCap::logEvent from cron method.");
 
+        // Check if mandatory system settings were defined. If not, exit
+        $sender = $this->getSystemSetting("sender");
+
+        // DEBUG
+        Plugin::log("System Settings[sender]: $sender");
+
+        if ($sender == NULL) {
+            return;
+        }
+
         // Set project specific scope
         global $Project;
 
@@ -107,7 +117,7 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 $recipients = $this->getSubSettings("recipients");
 
                 // DEBUG
-                Plugin::log("Project Settings[recipients]:", $recipients);
+                // Plugin::log("Project Settings[recipients]:", $recipients);
 
                 if (sizeof($recipients) == 0) {
                     return;
@@ -164,7 +174,7 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
 
                             REDCap::email(
                                 $user['user_email'],
-                                "maximo.ramirez@isglobal.org",
+                                $sender,
                                 "New records created during the last minute!!",
                                 "Is this test working?"
                             );

@@ -20,6 +20,15 @@
     }
   ],
 
+  "system-settings": [
+    {
+      "key": "sender",
+      "name": "Sender email address",
+      "type": "text",
+      "required": true
+    }
+  ],
+
   "project-settings": [
     {
       "key": "recipients",
