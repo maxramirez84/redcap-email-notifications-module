@@ -117,6 +117,53 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     }
 
     /**
+     * Build the body of the notification email. If project language is not passed,
+     * English is used by default.
+     *
+     * @param int    $project_id             Id of project receiving the new records
+     * @param string $project_app_title      Title of project receiving the new
+     *                                       records
+     * @param string $field_sender_full_name Full name of user sending the new
+     *                                       records
+     * @param string $field_sender_username  Username of user sending the new records
+     * @param string $project_language       Language of the email to be sent
+     *
+     * @return string Message for the notification email body
+     */
+    public function buildEmailBody(
+        $project_id,
+        $project_app_title,
+        $field_sender_full_name,
+        $field_sender_username,
+        $project_language = 'English'
+    ) {
+        global $redcap_version;
+
+        $project_lang = $this->callLanguageFile($project_language);
+        $global_lang = Language::getLanguage($project_language);
+
+        $msg = $global_lang['global_21'];
+        $msg .= "<br><br>\n";
+        $msg .= $project_lang['em_email_notifications_02'] . " ";
+        $msg .= RCView::escape(
+            "$field_sender_full_name  ($field_sender_username) "
+        );
+        $msg .= $project_lang['em_email_notifications_03'] . " ";
+        $msg .= '"' . RCView::b(RCView::escape($project_app_title)) . '"' .
+            $global_lang['period'];
+        $msg .= "<br><br>\n";
+        $link = APP_PATH_WEBROOT_FULL .
+            "redcap_v$redcap_version/DataEntry/record_status_dashboard.php?pid=" .
+            $project_id;
+        $msg .= RCView::a(
+            array('href' => $link),
+            $project_lang['em_email_notifications_04']
+        );
+
+        return $msg;
+    }
+
+    /**
      * Function called by the Cron equally named to check and notify if new records
      * were created through the API in the specified time interval.
      *
@@ -128,7 +175,6 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
      */
     public function minuteNotifications()
     {
-        global $redcap_version;
         global $Project;
 
         // DEBUG
@@ -165,7 +211,6 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 // EM internationalization from project language value
                 $project_language = $Project->project['project_language'];
                 $project_lang = $this->callLanguageFile($project_language);
-                $global_lang = Language::getLanguage($project_language);
 
                 // DEBUG
                 // REDCap::logEvent(
@@ -260,27 +305,15 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                             $subject = $project_lang['em_email_notifications_01'] .
                                 " " . RCView::escape($Project->project['app_title']);
 
-                            $msg = $global_lang['global_21'];
-                            $msg .= "<br><br>\n";
-                            $msg .= $project_lang['em_email_notifications_02'] . " ";
-                            $msg .= RCView::escape(
-                                $field_sender['user_firstname'] . " " .
-                                $field_sender['user_lastname'] . " (" .
-                                $field_sender['username'] . ") "
-                            );
-                            $msg .= $project_lang['em_email_notifications_03'] . " ";
-                            $msg .= '"' .
-                                RCView::b(
-                                    RCView::escape($Project->project['app_title'])
-                                ) . '"' . $global_lang['period'];
-                            $msg .= "<br><br>\n";
-                            $link = APP_PATH_WEBROOT_FULL .
-                                "redcap_v$redcap_version" .
-                                '/DataEntry/record_status_dashboard.php?pid=' .
-                                $project_id;
-                            $msg .= RCView::a(
-                                array('href' => $link),
-                                $project_lang['em_email_notifications_04']
+                            $field_sender_full_name = $field_sender['user_firstname']
+                                . " " . $field_sender['user_lastname'];
+
+                            $msg = $this->buildEmailBody(
+                                $project_id,
+                                $Project->project['app_title'],
+                                $field_sender_full_name,
+                                $field_sender['username'],
+                                $project_language
                             );
 
                             REDCap::email(
