@@ -20,6 +20,7 @@ namespace ISGlobal\EmailNotificationsExternalModule;
 use Exception;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
+use Language;
 use Plugin;
 use Project;
 use RCView;
@@ -127,6 +128,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
      */
     public function minuteNotifications()
     {
+        global $redcap_version;
+        global $Project;
+
         // DEBUG
         // REDCap::logEvent("System-level REDCap::logEvent from cron method.");
 
@@ -141,13 +145,14 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         }
 
         // Set project specific scope
-        global $Project;
-
         if (count($this->_enabled_projects) > 0) {
             foreach ($this->_enabled_projects as $project_id => $project) {
                 // Set project specific scope
                 try {
                     $Project = new Project($project_id);
+
+                    // DEBUG
+                    // Plugin::log("Project's basic values:", $Project->project);
                 } catch (Exception $e) {
                     REDCap::logEvent(
                         "Caught exception in " . $this->PREFIX . ": " .
@@ -160,6 +165,7 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 // EM internationalization from project language value
                 $project_language = $Project->project['project_language'];
                 $project_lang = $this->callLanguageFile($project_language);
+                $global_lang = Language::getLanguage($project_language);
 
                 // DEBUG
                 // REDCap::logEvent(
@@ -200,6 +206,31 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                     // DEBUG
                     Plugin::log("New records created during the last minute!");
 
+                    $record = $result_records->fetch_assoc();
+
+                    // DEBUG
+                    Plugin::log("Result:", $record);
+
+                    // Get field sender information
+                    $query = "SELECT * FROM %s WHERE username = '%s'";
+                    $sql = sprintf(
+                        $query,
+                        self::REDCAP_USER_INFORMATION_TABLE,
+                        $record['user']
+                    );
+
+                    // DEBUG
+                    Plugin::log(
+                        "Checking in DB information of sender from the field",
+                        $sql
+                    );
+
+                    $result_field_sender = $this->query($sql);
+                    $field_sender = $result_field_sender->fetch_assoc();
+
+                    // DEBUG
+                    Plugin::log("Result:", $field_sender);
+
                     // Send email notification to users with 'minute' frequency
                     // configured in project settings
                     foreach ($recipients as $key => $recipient) {
@@ -226,11 +257,37 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                             // DEBUG
                             Plugin::log("Result:", $user);
 
+                            $subject = $project_lang['em_email_notifications_01'] .
+                                " " . RCView::escape($Project->project['app_title']);
+
+                            $msg = $global_lang['global_21'];
+                            $msg .= "<br><br>\n";
+                            $msg .= $project_lang['em_email_notifications_02'] . " ";
+                            $msg .= RCView::escape(
+                                $field_sender['user_firstname'] . " " .
+                                $field_sender['user_lastname'] . " (" .
+                                $field_sender['username'] . ") "
+                            );
+                            $msg .= $project_lang['em_email_notifications_03'] . " ";
+                            $msg .= '"' .
+                                RCView::b(
+                                    RCView::escape($Project->project['app_title'])
+                                ) . '"' . $global_lang['period'];
+                            $msg .= "<br><br>\n";
+                            $link = APP_PATH_WEBROOT_FULL .
+                                "redcap_v$redcap_version" .
+                                '/DataEntry/record_status_dashboard.php?pid=' .
+                                $project_id;
+                            $msg .= RCView::a(
+                                array('href' => $link),
+                                $project_lang['em_email_notifications_04']
+                            );
+
                             REDCap::email(
                                 $user['user_email'],
                                 $sender,
-                                $project_lang['em_email_notifications_01'],
-                                "Is this test working?"
+                                $subject,
+                                $msg
                             );
                         }
                     }
