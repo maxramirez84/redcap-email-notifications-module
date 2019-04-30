@@ -164,6 +164,31 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     }
 
     /**
+     * Retrieve email from DB based on the username.
+     *
+     * @param string $username Username of the email address needed
+     *
+     * @return string Email address of the indicated user
+     */
+    public function getUserEmail($username)
+    {
+        // Get user email
+        $query = "SELECT * FROM %s WHERE username = '%s'";
+        $sql = sprintf($query, self::REDCAP_USER_INFORMATION_TABLE, $username);
+
+        // DEBUG
+        Plugin::log("Checking in DB user information", $sql);
+
+        $result_user = $this->query($sql);
+        $user = $result_user->fetch_assoc();
+
+        // DEBUG
+        Plugin::log("Result:", $user);
+
+        return $user['user_email'];
+    }
+
+    /**
      * Function called by the Cron equally named to check and notify if new records
      * were created through the API in the specified time interval.
      *
@@ -285,22 +310,7 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                                 "Sending email notification to " . $recipient['user']
                             );
 
-                            // Get user email
-                            $query = "SELECT * FROM %s WHERE username = '%s'";
-                            $sql = sprintf(
-                                $query,
-                                self::REDCAP_USER_INFORMATION_TABLE,
-                                $recipient['user']
-                            );
-
-                            // DEBUG
-                            Plugin::log("Checking in DB user information", $sql);
-
-                            $result_user = $this->query($sql);
-                            $user = $result_user->fetch_assoc();
-
-                            // DEBUG
-                            Plugin::log("Result:", $user);
+                            $user_email = $this->getUserEmail($recipient['user']);
 
                             $subject = $project_lang['em_email_notifications_01'] .
                                 " " . RCView::escape($Project->project['app_title']);
@@ -316,12 +326,7 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                                 $project_language
                             );
 
-                            REDCap::email(
-                                $user['user_email'],
-                                $sender,
-                                $subject,
-                                $msg
-                            );
+                            REDCap::email($user_email, $sender, $subject, $msg);
                         }
                     }
                 }
