@@ -220,21 +220,33 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
      * Check if new records were created through the API.
      *
      * @param int $project_id ID of project to be checked if new records arrived
+     * @param string $time_interval {minute, hourly, daily, weekly, monthly}
      *
      * @return string Username of who created the records. NULL if no new records
      */
-    public function newRecordsThroughAPI($project_id)
+    public function newRecordsThroughAPI($project_id, $time_interval)
     {
+        switch ($time_interval) {
+            case "minute":
+                $unit = "MINUTE";
+                break;
+            case "hourly":
+                $unit = "HOUR";
+                break;
+            default:
+                $unit = "MINUTE";
+        }
         $query = "SELECT * FROM %s " .
             "WHERE project_id = %d " .
             "AND description LIKE '%%%s%%' " .
-            "AND ts >= (NOW() - INTERVAL 1 MINUTE)";
+            "AND ts >= (NOW() - INTERVAL 1 %s)";
 
         $sql = sprintf(
             $query,
             self::REDCAP_LOG_EVENT_TABLE,
             $project_id,
-            self::CREATE_RECORD_API_DESCRIPTION
+            self::CREATE_RECORD_API_DESCRIPTION,
+            $unit
         );
 
         // DEBUG
@@ -322,7 +334,10 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 }
 
                 // Send email notification if new records were created
-                $field_sender_username = $this->newRecordsThroughAPI($project_id);
+                $field_sender_username = $this->newRecordsThroughAPI(
+                    $project_id,
+                    $time_interval
+                );
                 if (!is_null($field_sender_username)) {
                     // DEBUG
                     Plugin::log("New records created during the last minute!");
@@ -370,6 +385,24 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     {
         try {
             $this->notify("minute");
+        } catch (Exception $e) {
+            REDCap::logEvent(
+                "Caught exception in " . $this->PREFIX . ": " .
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Function called by the Cron hourly_notifications
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function hourlyNotifications()
+    {
+        try {
+            $this->notify("hourly");
         } catch (Exception $e) {
             REDCap::logEvent(
                 "Caught exception in " . $this->PREFIX . ": " .

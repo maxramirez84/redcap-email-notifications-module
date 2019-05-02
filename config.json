@@ -17,6 +17,13 @@
       "method": "minuteNotifications",
       "cron_frequency": "60",
       "cron_max_run_time": "300"
+    },
+    {
+      "cron_name": "hourly_notifications",
+      "cron_description": "Cron that runs every hour to check and notify if new records were created through the API",
+      "method": "hourlyNotifications",
+      "cron_frequency": "3600",
+      "cron_max_run_time": "300"
     }
   ],
 
