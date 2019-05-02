@@ -255,16 +255,18 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     }
 
     /**
-     * Function called by the Cron equally named to check and notify if new records
-     * were created through the API in the specified time interval.
+     * Check and notify if new records were created through the API in the specified
+     * time interval.
      *
      * For setting project specific scope (by chris.kadolph):
      * https://community.projectredcap.org/questions/46367/project-specific-external-module-cron-jobs.html
      *
+     * @param string $time_interval {minute, hourly, daily, weekly, monthly}
+     *
      * @return void
      * @throws Exception
      */
-    public function minuteNotifications()
+    public function notify($time_interval)
     {
         global $Project;
 
@@ -328,7 +330,7 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                     // Send email notification to users with 'minute' frequency
                     // configured in project settings
                     foreach ($recipients as $key => $recipient) {
-                        if ($recipient['frequency'] == "minute") {
+                        if ($recipient['frequency'] == $time_interval) {
                             // DEBUG
                             Plugin::log(
                                 "Sending email notification to " . $recipient['user']
@@ -355,6 +357,24 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Function called by the Cron minute_notifications
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function minuteNotifications()
+    {
+        try {
+            $this->notify("minute");
+        } catch (Exception $e) {
+            REDCap::logEvent(
+                "Caught exception in " . $this->PREFIX . ": " .
+                $e->getMessage()
+            );
         }
     }
 }
