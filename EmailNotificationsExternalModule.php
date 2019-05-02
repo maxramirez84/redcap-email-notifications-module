@@ -217,6 +217,44 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     }
 
     /**
+     * Check if new records were created through the API.
+     *
+     * @param int $project_id ID of project to be checked if new records arrived
+     *
+     * @return string Username of who created the records. NULL if no new records
+     */
+    public function newRecordsThroughAPI($project_id)
+    {
+        $query = "SELECT * FROM %s " .
+            "WHERE project_id = %d " .
+            "AND description LIKE '%%%s%%' " .
+            "AND ts >= (NOW() - INTERVAL 1 MINUTE)";
+
+        $sql = sprintf(
+            $query,
+            self::REDCAP_LOG_EVENT_TABLE,
+            $project_id,
+            self::CREATE_RECORD_API_DESCRIPTION
+        );
+
+        // DEBUG
+        Plugin::log("Checking in DB if new records arrived", $sql);
+
+        $result_records = $this->query($sql);
+
+        if ($result_records->num_rows > 0) {
+            $record = $result_records->fetch_assoc();
+
+            // DEBUG
+            Plugin::log("Result:", $record);
+
+            return $record['user'];
+        }
+
+        return null;
+    }
+
+    /**
      * Function called by the Cron equally named to check and notify if new records
      * were created through the API in the specified time interval.
      *
@@ -282,32 +320,10 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 }
 
                 // Send email notification if new records were created
-                // Check if new records were created through the API during the
-                // last minute
-                $query = "SELECT * FROM %s " .
-                    "WHERE project_id = %d " .
-                    "AND description LIKE '%%%s%%' " .
-                    "AND ts >= (NOW() - INTERVAL 1 MINUTE)";
-
-                $sql = sprintf(
-                    $query,
-                    self::REDCAP_LOG_EVENT_TABLE,
-                    $project_id,
-                    self::CREATE_RECORD_API_DESCRIPTION
-                );
-
-                // DEBUG
-                Plugin::log("Checking in DB if new records arrived", $sql);
-
-                $result_records = $this->query($sql);
-                if ($result_records->num_rows > 0) {
+                $field_sender_username = $this->newRecordsThroughAPI($project_id);
+                if (!is_null($field_sender_username)) {
                     // DEBUG
                     Plugin::log("New records created during the last minute!");
-
-                    $record = $result_records->fetch_assoc();
-
-                    // DEBUG
-                    Plugin::log("Result:", $record);
 
                     // Send email notification to users with 'minute' frequency
                     // configured in project settings
@@ -324,13 +340,13 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                                 " " . RCView::escape($Project->project['app_title']);
 
                             $field_sender_full_name
-                                = $this->getUserFullName($record['user']);
+                                = $this->getUserFullName($field_sender_username);
 
                             $msg = $this->buildEmailBody(
                                 $project_id,
                                 $Project->project['app_title'],
                                 $field_sender_full_name,
-                                $record['user'],
+                                $field_sender_username,
                                 $project_language
                             );
 
