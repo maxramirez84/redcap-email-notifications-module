@@ -189,6 +189,34 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     }
 
     /**
+     * Retrieve first and last name from DB based on the username and concatenate
+     * them to compose the user full name.
+     *
+     * @param string $username Username of the email address needed
+     *
+     * @return string Full name of the indicated user
+     */
+    public function getUserFullName($username)
+    {
+        // Get user email
+        $query = "SELECT * FROM %s WHERE username = '%s'";
+        $sql = sprintf($query, self::REDCAP_USER_INFORMATION_TABLE, $username);
+
+        // DEBUG
+        Plugin::log("Checking in DB user information", $sql);
+
+        $result_user = $this->query($sql);
+        $user = $result_user->fetch_assoc();
+
+        // DEBUG
+        Plugin::log("Result:", $user);
+
+        $full_name = $user['user_firstname'] . " " . $user['user_lastname'];
+
+        return $full_name;
+    }
+
+    /**
      * Function called by the Cron equally named to check and notify if new records
      * were created through the API in the specified time interval.
      *
@@ -281,26 +309,6 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                     // DEBUG
                     Plugin::log("Result:", $record);
 
-                    // Get field sender information
-                    $query = "SELECT * FROM %s WHERE username = '%s'";
-                    $sql = sprintf(
-                        $query,
-                        self::REDCAP_USER_INFORMATION_TABLE,
-                        $record['user']
-                    );
-
-                    // DEBUG
-                    Plugin::log(
-                        "Checking in DB information of sender from the field",
-                        $sql
-                    );
-
-                    $result_field_sender = $this->query($sql);
-                    $field_sender = $result_field_sender->fetch_assoc();
-
-                    // DEBUG
-                    Plugin::log("Result:", $field_sender);
-
                     // Send email notification to users with 'minute' frequency
                     // configured in project settings
                     foreach ($recipients as $key => $recipient) {
@@ -315,14 +323,14 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                             $subject = $project_lang['em_email_notifications_01'] .
                                 " " . RCView::escape($Project->project['app_title']);
 
-                            $field_sender_full_name = $field_sender['user_firstname']
-                                . " " . $field_sender['user_lastname'];
+                            $field_sender_full_name
+                                = $this->getUserFullName($record['user']);
 
                             $msg = $this->buildEmailBody(
                                 $project_id,
                                 $Project->project['app_title'],
                                 $field_sender_full_name,
-                                $field_sender['username'],
+                                $record['user'],
                                 $project_language
                             );
 
