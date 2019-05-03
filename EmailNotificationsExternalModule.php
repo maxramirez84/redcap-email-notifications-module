@@ -127,6 +127,8 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
      *                                       records
      * @param string $field_sender_username  Username of user sending the new records
      * @param string $project_language       Language of the email to be sent
+     * @param string $time_interval          {minute, hourly, daily, weekly, monthly}
+     * @param int    $count                  Number of new records received
      *
      * @return string Message for the notification email body
      */
@@ -135,7 +137,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         $project_app_title,
         $field_sender_full_name,
         $field_sender_username,
-        $project_language = 'English'
+        $project_language = 'English',
+        $time_interval = 'minute',
+        $count = null
     ) {
         global $redcap_version;
 
@@ -144,14 +148,31 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
 
         $msg = $global_lang['global_21'];
         $msg .= "<br><br>\n";
-        $msg .= $project_lang['em_email_notifications_02'] . " ";
+
+        if (!is_null($count)) {
+            $msg .= RCView::b($count) . " ";
+            if ($count == 1) {
+                $msg .= $project_lang['em_email_notifications_05'] . " ";
+            } elseif ($count > 1) {
+                $msg .= $project_lang['em_email_notifications_06'] . " ";
+            }
+        } else {
+            $msg .= $project_lang['em_email_notifications_02'] . " ";
+        }
         $msg .= RCView::escape(
             "$field_sender_full_name  ($field_sender_username) "
         );
         $msg .= $project_lang['em_email_notifications_03'] . " ";
-        $msg .= '"' . RCView::b(RCView::escape($project_app_title)) . '"' .
-            $global_lang['period'];
+        $msg .= '"' . RCView::b(RCView::escape($project_app_title)) . '" ';
+        $msg .= $project_lang['em_email_notifications_07'] . " ";
+        switch ($time_interval) {
+            case "hourly":
+                $msg .= $project_lang['em_email_notifications_08'];
+                break;
+        }
+        $msg .= $global_lang['period'];
         $msg .= "<br><br>\n";
+
         $link = APP_PATH_WEBROOT_FULL .
             "redcap_v$redcap_version/DataEntry/record_status_dashboard.php?pid=" .
             $project_id;
@@ -219,10 +240,15 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     /**
      * Check if new records were created through the API.
      *
-     * @param int $project_id ID of project to be checked if new records arrived
+     * @param int    $project_id    ID of project to be checked if new records
+     *                              arrived
      * @param string $time_interval {minute, hourly, daily, weekly, monthly}
      *
-     * @return string Username of who created the records. NULL if no new records
+     * @return array {
+     *                  count    => Count of new records,
+     *                  username => Username of who created the records
+     *               }
+     *               NULL if no new records
      */
     public function newRecordsThroughAPI($project_id, $time_interval)
     {
@@ -260,7 +286,10 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
             // DEBUG
             Plugin::log("Result:", $record);
 
-            return $record['user'];
+            return array(
+                'count'    => $result_records->num_rows,
+                'username' => $record['user']
+            );
         }
 
         return null;
@@ -334,11 +363,11 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 }
 
                 // Send email notification if new records were created
-                $field_sender_username = $this->newRecordsThroughAPI(
+                $new_records_summary = $this->newRecordsThroughAPI(
                     $project_id,
                     $time_interval
                 );
-                if (!is_null($field_sender_username)) {
+                if (!is_null($new_records_summary)) {
                     // DEBUG
                     Plugin::log("New records created during the last minute!");
 
@@ -356,15 +385,27 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                             $subject = $project_lang['em_email_notifications_01'] .
                                 " " . RCView::escape($Project->project['app_title']);
 
-                            $field_sender_full_name
-                                = $this->getUserFullName($field_sender_username);
+                            $field_sender_full_name = $this->getUserFullName(
+                                $new_records_summary['username']
+                            );
+
+                            // If notifications frequency is per minute, including
+                            // the records count in the email body is confusing. So
+                            // count is included when time interval is large than
+                            // minute
+                            $records_count = null;
+                            if ($time_interval != "minute") {
+                                $records_count = $new_records_summary['count'];
+                            }
 
                             $msg = $this->buildEmailBody(
                                 $project_id,
                                 $Project->project['app_title'],
                                 $field_sender_full_name,
-                                $field_sender_username,
-                                $project_language
+                                $new_records_summary['username'],
+                                $project_language,
+                                $time_interval,
+                                $records_count
                             );
 
                             REDCap::email($user_email, $sender, $subject, $msg);
