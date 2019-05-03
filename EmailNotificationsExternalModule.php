@@ -164,11 +164,22 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         );
         $msg .= $project_lang['em_email_notifications_03'] . " ";
         $msg .= '"' . RCView::b(RCView::escape($project_app_title)) . '" ';
-        $msg .= $project_lang['em_email_notifications_07'] . " ";
-        switch ($time_interval) {
-            case "hourly":
-                $msg .= $project_lang['em_email_notifications_08'];
-                break;
+        if ($time_interval != "minute") {
+            $msg .= $project_lang['em_email_notifications_07'] . " ";
+            switch ($time_interval) {
+                case "hourly":
+                    $msg .= $project_lang['em_email_notifications_08'];
+                    break;
+                case "daily":
+                    $msg .= $project_lang['em_email_notifications_09'];
+                    break;
+                case "weekly":
+                    $msg .= $project_lang['em_email_notifications_10'];
+                    break;
+                case "monthly":
+                    $msg .= $project_lang['em_email_notifications_11'];
+                    break;
+            }
         }
         $msg .= $global_lang['period'];
         $msg .= "<br><br>\n";
@@ -258,6 +269,15 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 break;
             case "hourly":
                 $unit = "HOUR";
+                break;
+            case "daily":
+                $unit = "DAY";
+                break;
+            case "weekly":
+                $unit = "WEEK";
+                break;
+            case "monthly":
+                $unit = "MONTH";
                 break;
             default:
                 $unit = "MINUTE";
@@ -444,6 +464,60 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     {
         try {
             $this->notify("hourly");
+        } catch (Exception $e) {
+            REDCap::logEvent(
+                "Caught exception in " . $this->PREFIX . ": " .
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Function called by the Cron daily_notifications
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function dailyNotifications()
+    {
+        try {
+            $this->notify("daily");
+        } catch (Exception $e) {
+            REDCap::logEvent(
+                "Caught exception in " . $this->PREFIX . ": " .
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Function called by the Cron weekly_notifications
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function weeklyNotifications()
+    {
+        try {
+            $this->notify("weekly");
+        } catch (Exception $e) {
+            REDCap::logEvent(
+                "Caught exception in " . $this->PREFIX . ": " .
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Function called by the Cron monthly_notifications
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function monthlyNotifications()
+    {
+        try {
+            $this->notify("monthly");
         } catch (Exception $e) {
             REDCap::logEvent(
                 "Caught exception in " . $this->PREFIX . ": " .

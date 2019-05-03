@@ -24,6 +24,27 @@
       "method": "hourlyNotifications",
       "cron_frequency": "3600",
       "cron_max_run_time": "300"
+    },
+    {
+      "cron_name": "daily_notifications",
+      "cron_description": "Cron that runs every day to check and notify if new records were created through the API",
+      "method": "dailyNotifications",
+      "cron_frequency": "86400",
+      "cron_max_run_time": "300"
+    },
+    {
+      "cron_name": "weekly_notifications",
+      "cron_description": "Cron that runs every week to check and notify if new records were created through the API",
+      "method": "weeklyNotifications",
+      "cron_frequency": "604800",
+      "cron_max_run_time": "300"
+    },
+    {
+      "cron_name": "monthly_notifications",
+      "cron_description": "Cron that runs every month to check and notify if new records were created through the API",
+      "method": "monthlyNotifications",
+      "cron_frequency": "2592000",
+      "cron_max_run_time": "300"
     }
   ],
 
@@ -62,6 +83,18 @@
             {
               "value": "hourly",
               "name": "Hourly"
+            },
+            {
+              "value": "daily",
+              "name": "Daily"
+            },
+            {
+              "value": "weekly",
+              "name": "Weekly"
+            },
+            {
+              "value": "monthly",
+              "name": "Monthly"
             }
           ]
         }
