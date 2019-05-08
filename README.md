@@ -43,3 +43,15 @@ After that, the EM will appear under the _Modules Currently Available on this Sy
 button and complete the _Sender email address_ field with a valid email address. This will be the email address used in
 the _FROM_, i.e. from whom the email will appear to be sent. This will also be the "reply-to" address as it appears to 
 the recipient.
+
+## Usage
+
+Login REDCap and access to any project in which you have the _Project Setup/Design_ privilege. Under the _Applications_
+section, click on the _External Modules_ link. After that, click on the _Enable a module_ button. Look for the 
+_Email Notifications vX.X.X_ module and click on its _Enable_ button (on the right). 
+
+The module is now enabled in the project. It should appear under the _Currently Enabled Modules_ section within the 
+project. The next step is to configure it. Therefore, click on the _Configure_ button close to the 
+_Email Notifications - vX.X.X_ module. A popup will be displayed allowing us to define as many notification recipients
+as we want. Each of the recipients will have its own notification frequency. To add more than one recipient, click on
+the _+_ button. 
