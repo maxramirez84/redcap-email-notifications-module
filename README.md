@@ -24,4 +24,16 @@ Thus, the _Email Notification EM_ sends every minute, hour, day, week or month a
 the field, i.e. from the _REDCap Mobile App_. This summary includes the number of records created, who created them and 
 in which project.
 
+## Installation
+
+This External Module is not part of the [_REDCap Repo_](https://redcap.vanderbilt.edu/consortium/modules/index.php) yet.
+Therefore, you will need to copy and paste manually the email_notifications_vX.X.X folder to the REDCap _modules_ 
+directory, usually at:
+
+`/var/www/html/redcap/modules/email_notifications_vX.X.X`
+
+Once you have copied the folder, login _REDCap_ with an _Admin_ account and navigate to the _Control Center_. Then, 
+click on the _External Modules_ link (within the _Technical / Developer Tools_ section) and after on the 
+_Enable a module_ button. A popup will be open from where you will be able to enable the module.
+
   
