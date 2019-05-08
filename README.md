@@ -30,7 +30,10 @@ This External Module is not part of the [_REDCap Repo_](https://redcap.vanderbil
 Therefore, you will need to copy and paste manually the email_notifications_vX.X.X folder to the REDCap _modules_ 
 directory, usually at:
 
-`/var/www/html/redcap/modules/email_notifications_vX.X.X`
+```bash
+cp -R email_notifications_vX.X.X /var/www/html/redcap/modules/
+chown www-data:www-data -R /var/www/html/redcap/modules/email_notifications_vX.X.X 
+```
 
 Once you have copied the folder, login _REDCap_ with an _Admin_ account and navigate to the _Control Center_. Then, 
 click on the _External Modules_ link (within the _Technical / Developer Tools_ section) and after on the 
