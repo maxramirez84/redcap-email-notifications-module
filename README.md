@@ -39,4 +39,7 @@ Once you have copied the folder, login _REDCap_ with an _Admin_ account and navi
 click on the _External Modules_ link (within the _Technical / Developer Tools_ section) and after on the 
 _Enable a module_ button. A popup will be open from where you will be able to enable the module.
 
-  
+After that, the EM will appear under the _Modules Currently Available on this System_ section. Click on the _Configure_
+button and complete the _Sender email address_ field with a valid email address. This will be the email address used in
+the _FROM_, i.e. from whom the email will appear to be sent. This will also be the "reply-to" address as it appears to 
+the recipient.
