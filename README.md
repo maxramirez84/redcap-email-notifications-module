@@ -61,3 +61,10 @@ the _+_ button.
 For reporting any problem and/or any feature request, go to the 
 [Issues](https://github.com/maxramirez84/redcap-email-notifications-module/issues) tracker on GitHub. For any other 
 question, write an email to [maximo.ramirez@isglobal.org](mailto:maximo.ramirez@isglobal.org).
+
+## Roadmap
+
+1. **Send notifications in a concrete date and time**: daily, weekly or monthly notifications are triggered when REDCap
+considers that interval has passed by and not at the end of the day, week or month. Next step is to provide the user
+with the capacity of defining when she wants to send the notifications. E.g. notify me **how many** records were created 
+during the **last week** on **Fridays at 18:00**.
