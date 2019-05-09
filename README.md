@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
 [![Release: v1.0.0](https://img.shields.io/github/release/maxramirez84/redcap-email-notifications-module.svg)](https://github.com/maxramirez84/redcap-email-notifications-module/releases/tag/v1.0.0)
 
-This README file hs been written following the recommendations given at [Make a README](https://www.makeareadme.com/).
+This README file has been written following the recommendations given at [Make a README](https://www.makeareadme.com/).
 
 > [External Modules](https://github.com/vanderbilt/redcap-external-modules) are individual packages of software that can
 be downloaded and installed by a [_REDCap_](https://www.project-redcap.org/) administrator. Modules can extend 
