@@ -68,3 +68,10 @@ question, write an email to [maximo.ramirez@isglobal.org](mailto:maximo.ramirez@
 considers that interval has passed by and not at the end of the day, week or month. Next step is to provide the user
 with the capacity of defining when she wants to send the notifications. E.g. notify me **how many** records were created 
 during the **last week** on **Fridays at 18:00**.
+
+## Authors and acknowledgment
+
+This EM is entirely coded by [Máximo Ramírez from ISGlobal](https://www.isglobal.org/en/person?p_p_id=viewpersona_WAR_intranetportlet&p_p_lifecycle=0&p_p_col_id=column-3&p_p_col_count=1&_viewpersona_WAR_intranetportlet_struts_action=%2Fview%2FpersonaView&_viewpersona_WAR_intranetportlet_personaId=9401&_viewpersona_WAR_intranetportlet_typeOfPeople=staff).
+
+Chris Kadolph is acknowledged by his [contribution](https://community.projectredcap.org/questions/46367/project-specific-external-module-cron-jobs.html) 
+for setting project specific scope in REDCap EMs. 
