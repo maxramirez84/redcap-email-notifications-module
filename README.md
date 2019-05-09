@@ -1,6 +1,7 @@
 # REDCap Email Notifications External Module
 
 [![License: MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
+[![Release: v1.0.0](https://img.shields.io/github/release/maxramirez84/redcap-email-notifications-module.svg)](https://github.com/maxramirez84/redcap-email-notifications-module/releases/tag/v1.0.0)
 
 > [External Modules](https://github.com/vanderbilt/redcap-external-modules) are individual packages of software that can
 be downloaded and installed by a [_REDCap_](https://www.project-redcap.org/) administrator. Modules can extend 
