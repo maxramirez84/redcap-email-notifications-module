@@ -55,3 +55,9 @@ project. The next step is to configure it. Therefore, click on the _Configure_ b
 _Email Notifications - vX.X.X_ module. A popup will be displayed allowing us to define as many notification recipients
 as we want. Each of the recipients will have its own notification frequency. To add more than one recipient, click on
 the _+_ button. 
+
+## Support
+
+For reporting any problem and/or any feature request, go to the 
+[Issues](https://github.com/maxramirez84/redcap-email-notifications-module/issues) tracker on GitHub. For any other 
+question, write an email to [maximo.ramirez@isglobal.org](mailto:maximo.ramirez@isglobal.org).
