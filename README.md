@@ -70,6 +70,25 @@ considers that interval has passed by and not at the end of the day, week or mon
 with the capacity of defining when she wants to send the notifications. E.g. notify me **how many** records were created 
 during the **last week** on **Fridays at 18:00**.
 
+## Contributing
+
+As far as this is a one-person repository, the branching model used is the simplest function model. I.e. two long-living
+branches, master and develop. Each release to production comes out from the master branch and it has a tag with a named
+version. The master branch is protected and it requires pull request reviews before merging. Therefore, all commits must 
+be made to the develop or any bug-fix branches (which are not protected) and then submitted via a pull request that will 
+have to be approved.
+
+![Simple branch strategy for small teams or individuals](https://cdn-images-1.medium.com/max/1600/1*_W8zvBeP6cKLFUjO5wzn3Q.png)
+
+This way the team can work on new features on a separate branch (develop), while the master is intact until the next 
+release. The main advantage of this approach is that, if you have bugs to fix (you will always have), you will be able 
+to solve the bug without having to stash your changes or speed up the features you are developing. So in these 
+situations, we create a short lived branch for the fix (a bug-fix branche), merge on the master and deploy to production 
+with a new tag, and propagate the fix to develop. When the new features are ready, they would already have the fixes, 
+and merging with the master branch would not be a problem [[Grazi Bonizi, 2018](https://medium.com/@grazibonizi/the-best-branching-model-to-work-with-git-4008a8098e6a)].
+
+Version numbers follow the recommendations from [Semantic Versioning 2.0.0](https://semver.org/). 
+
 ## Authors and acknowledgment
 
 This EM is entirely coded by [Máximo Ramírez from ISGlobal](https://www.isglobal.org/en/person?p_p_id=viewpersona_WAR_intranetportlet&p_p_lifecycle=0&p_p_col_id=column-3&p_p_col_count=1&_viewpersona_WAR_intranetportlet_struts_action=%2Fview%2FpersonaView&_viewpersona_WAR_intranetportlet_personaId=9401&_viewpersona_WAR_intranetportlet_typeOfPeople=staff).
