@@ -72,6 +72,8 @@ considers that interval has passed by and not at the end of the day, week or mon
 with the capacity of defining when she wants to send the notifications. E.g. notify me **how many** records were created 
 during the **last week** on **Fridays at 18:00**.
 
+2. **Log the action of notifying**: write a project log just after the email notification has been sent.
+
 ## Contributing
 
 As far as this is a one-person repository, the branching model used is the simplest function model. I.e. two long-living
