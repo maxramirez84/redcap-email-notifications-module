@@ -38,6 +38,12 @@ cp -R email_notifications_vX.X.X /var/www/html/redcap/modules/
 chown www-data:www-data -R /var/www/html/redcap/modules/email_notifications_vX.X.X 
 ```
 
+As this EM is using the _REDCap::email_ method to send the emails from a cron call. 
+[PHP sendmail](http://php.net/sendmail-path) configuration must be setup in _CLI/php.ini_ as well as in 
+_APACHE2/php.ini_. Although REDCap is not displaying any error related to the email configuration in the 
+_Control Center Configuration Check_, _CLI/php.ini_ must be checked to verify that _sendmail_ setup is the same as in 
+_APACHE2.ini_ [[REDCap::email from External Module Cron Job method](https://community.projectredcap.org/questions/60717/redcapemail-from-external-module-cron-job-method.html?childToView=61127)]. 
+
 Once you have copied the folder, login _REDCap_ with an _Admin_ account and navigate to the _Control Center_. Then, 
 click on the _External Modules_ link (within the _Technical / Developer Tools_ section) and after on the 
 _Enable a module_ button. A popup will be open from where you will be able to enable the module.
