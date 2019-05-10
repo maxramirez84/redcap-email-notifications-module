@@ -82,7 +82,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         global $lang;
 
         // DEBUG
-        Plugin::log("Project language = $language");
+        if (class_exists("Plugin")) {
+            Plugin::log("Project language = $language");
+        }
 
         // Get path of language file
         $dir = dirname(__FILE__);
@@ -90,7 +92,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         $language_file = $dir . DS . "$language.ini";
 
         // DEBUG
-        // Plugin::log("Language file path = $language_file");
+        //if (class_exists("Plugin")) {
+        //    Plugin::log("Language file path = $language_file");
+        //}
 
         // Parse ini file into an array
         $this_lang = parse_ini_file($language_file);
@@ -110,7 +114,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         }
 
         // DEBUG
-        Plugin::log("$language_file loaded");
+        if (class_exists("Plugin")) {
+            Plugin::log("$language_file loaded");
+        }
 
         // Return array of language text
         return $this_lang;
@@ -209,13 +215,17 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         $sql = sprintf($query, self::REDCAP_USER_INFORMATION_TABLE, $username);
 
         // DEBUG
-        Plugin::log("Checking in DB user information", $sql);
+        if (class_exists("Plugin")) {
+            Plugin::log("Checking in DB user information", $sql);
+        }
 
         $result_user = $this->query($sql);
         $user = $result_user->fetch_assoc();
 
         // DEBUG
-        Plugin::log("Result:", $user);
+        if (class_exists("Plugin")) {
+            Plugin::log("Result:", $user);
+        }
 
         return $user['user_email'];
     }
@@ -235,13 +245,17 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         $sql = sprintf($query, self::REDCAP_USER_INFORMATION_TABLE, $username);
 
         // DEBUG
-        Plugin::log("Checking in DB user information", $sql);
+        if (class_exists("Plugin")) {
+            Plugin::log("Checking in DB user information", $sql);
+        }
 
         $result_user = $this->query($sql);
         $user = $result_user->fetch_assoc();
 
         // DEBUG
-        Plugin::log("Result:", $user);
+        if (class_exists("Plugin")) {
+            Plugin::log("Result:", $user);
+        }
 
         $full_name = $user['user_firstname'] . " " . $user['user_lastname'];
 
@@ -296,7 +310,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         );
 
         // DEBUG
-        Plugin::log("Checking in DB if new records arrived", $sql);
+        if (class_exists("Plugin")) {
+            Plugin::log("Checking in DB if new records arrived", $sql);
+        }
 
         $result_records = $this->query($sql);
 
@@ -304,7 +320,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
             $record = $result_records->fetch_assoc();
 
             // DEBUG
-            Plugin::log("Result:", $record);
+            if (class_exists("Plugin")) {
+                Plugin::log("Result:", $record);
+            }
 
             return array(
                 'count'    => $result_records->num_rows,
@@ -338,7 +356,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
         $sender = $this->getSystemSetting("sender");
 
         // DEBUG
-        Plugin::log("System Settings[sender]: $sender");
+        if (class_exists("Plugin")) {
+            Plugin::log("System Settings[sender]: $sender");
+        }
 
         if ($sender == null) {
             return;
@@ -352,7 +372,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                     $Project = new Project($project_id);
 
                     // DEBUG
-                    // Plugin::log("Project's basic values:", $Project->project);
+                    //if (class_exists("Plugin")) {
+                    //    Plugin::log("Project's basic values:", $Project->project);
+                    //}
                 } catch (Exception $e) {
                     REDCap::logEvent(
                         "Caught exception in " . $this->PREFIX . ": " .
@@ -376,7 +398,9 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 $recipients = $this->getSubSettings("recipients");
 
                 // DEBUG
-                // Plugin::log("Project Settings[recipients]:", $recipients);
+                //if (class_exists("Plugin")) {
+                //    Plugin::log("Project Settings[recipients]:", $recipients);
+                //}
 
                 if (sizeof($recipients) == 0) {
                     return;
@@ -389,16 +413,21 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
                 );
                 if (!is_null($new_records_summary)) {
                     // DEBUG
-                    Plugin::log("New records created during the last minute!");
+                    if (class_exists("Plugin")) {
+                        Plugin::log("New records created during the last minute!");
+                    }
 
                     // Send email notification to users with 'minute' frequency
                     // configured in project settings
                     foreach ($recipients as $key => $recipient) {
                         if ($recipient['frequency'] == $time_interval) {
                             // DEBUG
-                            Plugin::log(
-                                "Sending email notification to " . $recipient['user']
-                            );
+                            if (class_exists("Plugin")) {
+                                Plugin::log(
+                                    "Sending email notification to " .
+                                    $recipient['user']
+                                );
+                            }
 
                             $user_email = $this->getUserEmail($recipient['user']);
 
