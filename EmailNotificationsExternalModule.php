@@ -38,6 +38,8 @@ use REDCap;
 class EmailNotificationsExternalModule extends AbstractExternalModule
 {
     const REDCAP_LOG_EVENT_TABLE = "redcap_log_event";
+    const REDCAP_PROJECTS_TABLE = "redcap_projects";
+    const REDCAP_LOG_EVENT_COLUMN = "log_event_table";
     const REDCAP_USER_INFORMATION_TABLE = "redcap_user_information";
     const CREATE_RECORD_API_DESCRIPTION = "Create record (API)";
 
@@ -263,6 +265,48 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
     }
 
     /**
+     * Get the name of the table where the logs are stored for this project
+     *
+     * @param int    $project_id    ID of project to be checked if new records
+     *                              arrived
+     *
+     * @return string Name of the table where the logs are.
+     *                NULL if there's no project with the indicated ID
+     */
+    public function getLogEventTable($project_id)
+    {
+        $query = "SELECT %s FROM %s " .
+            "WHERE project_id = %d ";
+
+        $sql = sprintf(
+            $query,
+            self::REDCAP_LOG_EVENT_COLUMN,
+            self::REDCAP_PROJECTS_TABLE,
+            $project_id
+        );
+
+        // DEBUG
+        if (class_exists("Plugin")) {
+            Plugin::log("Checking in DB the logs table of the project", $sql);
+        }
+
+        $result_records = $this->query($sql);
+
+        if ($result_records->num_rows > 0) {
+            $record = $result_records->fetch_assoc();
+
+            // DEBUG
+            if (class_exists("Plugin")) {
+                Plugin::log("Result:", $record);
+            }
+
+            return $record[self::REDCAP_LOG_EVENT_COLUMN];
+        }
+
+        return null;
+    }
+
+    /**
      * Check if new records were created through the API.
      *
      * @param int    $project_id    ID of project to be checked if new records
@@ -277,6 +321,8 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
      */
     public function newRecordsThroughAPI($project_id, $time_interval)
     {
+        $logs_table = $this->getLogEventTable($project_id);
+
         switch ($time_interval) {
             case "minute":
                 $unit = "MINUTE";
@@ -303,7 +349,7 @@ class EmailNotificationsExternalModule extends AbstractExternalModule
 
         $sql = sprintf(
             $query,
-            self::REDCAP_LOG_EVENT_TABLE,
+            $logs_table,
             $project_id,
             self::CREATE_RECORD_API_DESCRIPTION,
             $unit
