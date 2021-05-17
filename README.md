@@ -1,7 +1,7 @@
 # REDCap Email Notifications External Module
 
 [![License: MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
-[![Release: v1.0.0](https://img.shields.io/github/release/maxramirez84/redcap-email-notifications-module.svg)](https://github.com/maxramirez84/redcap-email-notifications-module/releases/tag/v1.0.0)
+[![Release: v1.0.0](https://img.shields.io/github/release/maxramirez84/redcap-email-notifications-module.svg)](https://github.com/maxramirez84/redcap-email-notifications-module/releases/tag/v1.0.2)
 
 This README file has been written following the recommendations given at [Make a README](https://www.makeareadme.com/).
 
